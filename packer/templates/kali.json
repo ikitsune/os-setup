@@ -1,0 +1,60 @@
+{
+    "builders": [
+        {
+            "type": "vmware-iso",
+            "iso_url": "iso/kali-linux-xfce-2019.1-amd64.iso",
+            "iso_checksum": "f86b3c6cc98af2d2d86e829fb8a3b08b4d5c4f376d6b8b1e108c58fcfdb46229",
+            "iso_checksum_type": "sha256",
+            "ssh_username": "root",
+            "ssh_password": "toor",
+            "headless": false, 
+            "ssh_wait_timeout": "30m",
+            "shutdown_command": "shutdown -P now",
+            "boot_wait": "5s",
+            "boot_command": [
+                "<esc><wait>",
+                "/install/vmlinuz noapic ",
+                "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kali-linux-rolling-preseed.cfg ",
+                "hostname=kali ",
+                "auto=true ",
+                "interface=auto ",
+                "domain=vm ",
+                "initrd=/install/initrd.gz -- <enter>"
+            ],
+            "cores": 4,
+            "memory": 4096,
+            "disk_size": 30000,
+            "display_name": "kali_test",
+            "guest_os_type": "debian9-64",
+            "http_directory": "http",
+            "vm_name": "kali_test",
+            "remote_type": "esx5",
+            "remote_host": "{{user `esxi_host`}}",
+            "remote_datastore": "{{user `esxi_datastore`}}",
+    	    "remote_username": "{{user `esxi_username`}}",
+    	    "remote_password": "{{user `esxi_password`}}",
+    	    "keep_registered": true
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "scripts/ansible.sh"
+        },
+        {
+            "type": "ansible-local",
+            "playbook_file": "ansible/playbook.yml",
+            "role_paths": [
+                "ansible/roles/bash",
+                "ansible/roles/basic_kali",
+                "ansible/roles/python"
+            ]
+        },
+        {
+            "type": "shell",
+            "script": "scripts/cleanup.sh"
+        }
+    ],
+    "post-processors": [
+    ]
+}

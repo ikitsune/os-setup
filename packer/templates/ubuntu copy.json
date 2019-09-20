@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "version": "",
+    "output_path": "output",
+    "vm_name": "1804"
+  },
+  "builders": [
+    {
+      "name": "1804",
+      "vm_name": "{{ user `vm_name` }}",
+      "vmdk_name": "1804-disk0",
+      "output_directory": "{{ user `output_path` }}",
+      "type": "vmware-iso",
+      "headless": true,
+      "disk_size": 81920,
+      "guest_os_type": "ubuntu-64",
+      "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04.2-server-amd64.iso",
+      "iso_checksum": "a2cb36dc010d98ad9253ea5ad5a07fd6b409e3412c48f1860536970b073c98f5",
+      "iso_checksum_type": "sha256",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_wait_timeout": "60m",
+      "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+      "http_directory": ".",
+      "tools_upload_flavor": "linux",
+      "boot_command": [
+        "<esc><esc><enter><wait>",
+        "/install/vmlinuz noapic ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/scripts/preseed.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname=bionicbeaver64 ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+        "initrd=/install/initrd.gz -- <enter>"
+      ]
+    }
+  ],
+  "provisioners": [
+  ],
+ "_comment": "Create an OVA because packer cannot.",
+ "post-processors": [
+   {
+      "type": "shell-local",
+      "inline": ["scripts/post-ova.sh {{user `output_path`}} {{user `vm_name`}}"]
+   }
+ ]
+}
