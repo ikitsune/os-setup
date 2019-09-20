@@ -1,0 +1,14 @@
+---
+# tasks file for install_recon_keys
+
+- name: Ensure recon-ng folder exists
+  become: yes
+  file:
+    path: ~/.recon-ng # required. Path to the file being managed.
+    state: directory
+
+- name: Install keys database in .recon-ng
+  become: yes
+  copy:
+      dest: ~/.recon-ng/keys.db
+      src: keys.db
