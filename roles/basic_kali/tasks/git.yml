@@ -1,0 +1,32 @@
+---
+- name: Ensure GIT is installed
+  become: yes
+  apt:
+    state: present
+    pkg: git
+
+- name: Clone respoistories into /opt
+  git:
+    repo: "{{ item.repo }}"
+    version: master
+    dest: /opt/{{ item.dest }}
+  with_items:
+    - {repo: "https://github.com/Vozzie/uacscript.git", dest: uacscript}
+    - {repo: "https://github.com/infodox/python-pty-shells.git", dest: python-pty-shells}
+    - {repo: "https://github.com/tcstool/NoSQLMap.git", dest: nosqlmap}
+    - {repo: "https://github.com/ChrisTruncer/EyeWitness.git", dest: eyewitness}
+    - {repo: "https://github.com/samratashok/nishang.git", dest: nishang}
+    - {repo: "https://github.com/PowerShellMafia/PowerSploit.git", dest: powersploit}
+    - {repo: "https://github.com/DanMcInerney/net-creds.git", dest: net-creds}  
+    - {repo: "https://github.com/PowerShellEmpire/Empire.git", dest: empire}
+    - {repo: "https://github.com/Dionach/CMSmap.git", dest: cmsmap}
+    - {repo: "https://github.com/droope/droopescan.git", dest: droopescan}
+    - {repo: "https://github.com/fuzzdb-project/fuzzdb", dest: fuzzdb}
+
+- name: Download Powersploit suplimental scripts
+  get_url: 
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {url: "https://raw.githubusercontent.com/obscuresec/random/master/StartListener.py", dest: "/opt/powersploit/StartListener.py"}
+    - {url: "https://raw.githubusercontent.com/darkoperator/powershell_scripts/master/ps_encoder.py", dest: "/opt/powersploit/ps_encoder.py"}

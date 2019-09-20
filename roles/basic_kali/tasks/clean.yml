@@ -1,0 +1,5 @@
+---
+- name: Clean the system packages
+  apt:
+    autoclean: yes
+    autoremove: yes

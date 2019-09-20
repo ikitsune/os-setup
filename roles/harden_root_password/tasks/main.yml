@@ -1,0 +1,13 @@
+---
+# tasks file for harden_root_password
+
+- set_fact:
+    my_pass: "{{ pwd_alias }}"
+
+- name: Harden root password
+  user:
+    name: root
+    password: "{{ my_pass | password_hash('sha512') }}"
+
+- debug:
+    msg: "Root Password: {{ my_pass }}"

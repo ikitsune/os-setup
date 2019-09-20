@@ -1,0 +1,29 @@
+- name: Update and Upgrade all packages
+  become: yes
+  become_user: root
+  apt: 
+    upgrade: dist 
+    update_cache: Yes
+
+- name: Check if a reboot is required
+  stat: 
+    path: /var/run/reboot-required 
+    get_md5: no
+  register: reboot_required_file
+
+- name: Reboot Machine
+  become: yes
+  become_user: root
+  shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+  async: 1
+  poll: 0
+  ignore_errors: true
+  when: reboot_required_file.stat.exists == true
+
+- name: Waiting for server to come back
+  become: no
+  local_action: wait_for
+    port=22
+    host={{ inventory_hostname }}
+    search_regex=OpenSSH
+    delay=10

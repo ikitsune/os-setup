@@ -1,0 +1,6 @@
+---
+- include: grub.yml
+- include: apt-repo.yml
+- include: git.yml
+- include: misc.yml
+- include: clean.yml

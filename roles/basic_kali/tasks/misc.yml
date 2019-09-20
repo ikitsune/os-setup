@@ -1,0 +1,20 @@
+---
+- name: Ensure checksec directory exists
+  file: 
+    mode: u=rwx,g=rx,o=rwx
+    path: /usr/share/checksec 
+    state: directory 
+
+- name: Ensure checksec is downloaded
+  get_url: 
+    mode: u=rwx,g=rx,o=rwx 
+    url: "http://www.trapkit.de/tools/checksec.sh" 
+    dest: /usr/share/checksec/checksec.sh
+
+- name: Block root wireshark warning
+  become_user: root
+  lineinfile: 
+    create: yes 
+    line: "privs.warn_if_elevated: FALSE" 
+    state: present 
+    path: ~/.wireshark/recent_common

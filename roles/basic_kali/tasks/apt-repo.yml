@@ -1,0 +1,70 @@
+---
+- name: Ensure east coast network respoistories are in the sources list
+  lineinfile:
+    path: /etc/apt/sources.list
+    state: present
+    line: "{{ item }}"
+  with_items:
+    - deb http://kali.download/kali kali-rolling main non-free contrib
+    - deb-src http://kali.download/kali kali-rolling main non-free contrib
+
+- name: Remove west coast network repositories from sources list 
+  lineinfile:
+    path: /etc/apt/sources.list
+    state: absent
+    line: "{{ item }}"
+  with_items:
+    - deb http://http.kali.org/kali kali-rolling main non-free contrib
+    - deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+
+- include: debian-update.yml
+
+- name: Ensure all the extra packages are installed
+  apt:
+    state: present
+    pkg:
+      - open-vm-tools
+      - open-vm-tools-desktop
+      - kali-linux-full
+      - exe2hexbat
+      - msfpc
+      - wdiff
+      - wdiff-doc
+      - virtualenvwrapper
+      - sparta
+      - wpscan
+      - htop
+      - hashid
+      - wifite
+      - unicornscan
+      - gobuster
+      - gcc
+      - g++
+      - gcc-multilib
+      - make
+      - automake
+      - build-essential
+      - dpkg-dev
+      - p7zip-full
+      - zip
+      - unzip
+      - unrar
+      - mingw-w64
+      - binutils-mingw-w64
+      - gcc-mingw-w64
+      - cmake
+      - mingw-w64-tools
+      - gcc-mingw-w64-i686
+      - gcc-mingw-w64-x86-64
+      - backdoor-factory
+      - responder
+      - windows-binaries
+      - bash-completion
+      - wireshark
+      - veil-evasion
+      - wordlists
+      - seclists
+      - tree
+      - terminator
+      - python3
+      - python3-pip
