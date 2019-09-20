@@ -1,0 +1,23 @@
+---
+- name: Ensure python3 is installed
+  become: yes
+  become_user: root
+  apt:
+    state: present
+    pkg:
+    - python3
+    - python3-pip
+
+- block:
+  - name: Configure interactive python
+    become: yes
+    become_user: '{{ item }}'
+    copy: src=pythonstartup dest=~/.pythonstartup
+    with_items: '{{ users }}'
+
+  - name: Ensure python config is in bashrc
+    become: yes
+    become_user: root
+    lineinfile: line='export PYTHONSTARTUP=$HOME/.pythonstartup' path=/etc/bash.bashrc state=present
+
+  when: users is defined

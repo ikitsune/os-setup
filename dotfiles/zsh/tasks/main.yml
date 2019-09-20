@@ -1,0 +1,48 @@
+---
+- name: Ensure ZSH is installed
+  become: yes
+  become_user: root
+  apt: pkg=zsh,git state=present
+  register: installation
+
+- block:
+  - name: Backup ~/.zshrc
+    become: yes
+    become_user: "{{ item }}"
+    copy: src={{ zshrc }} dest={{ zshrc }}.bak remote_src=yes backup=yes
+    ignore_errors: yes
+    with_items: "{{ users }}"
+
+  - name: Clone oh-my-zsh into home directories
+    become: yes
+    become_user: "{{ item }}"
+    git: repo=https://github.com/robbyrussell/oh-my-zsh dest=~/.oh-my-zsh
+    with_items: "{{ users }}"
+    register: cloning
+  
+  - name: Install template zshrc from oh-my-zsh
+    become: yes
+    become_user: "{{ item }}"
+    copy: remote_src=yes src={{ zshtemplate }} dest={{ zshrc }}
+    when: cloning.changed
+    with_items: "{{ users }}"
+
+  - name: Update ZSH theme
+    become: yes
+    become_user: "{{ item }}"
+    lineinfile: path={{ zshrc }} line='ZSH_THEME="mh"' regexp='^ZSH_THEME='
+    with_items: "{{ users }}"
+
+  - name: Update ZSH options
+    become: yes
+    become_user: "{{ item }}"
+    blockinfile: path={{ zshrc }} state=present block={{ lookup("file", "setopt.txt") }}
+    with_items: "{{ users }}"
+
+  - name: Ensure default shell is ZSH
+    become: yes
+    become_user: root
+    user: name={{ item }} shell=/usr/bin/zsh
+    with_items: "{{ users }}"
+
+  when: users is defined and installation is success

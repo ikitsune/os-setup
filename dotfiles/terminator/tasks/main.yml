@@ -1,0 +1,29 @@
+---
+- name: Ensure terminator is installed
+  become: yes
+  become_user: root
+  apt: pkg=terminator state=present
+  register: installation
+
+- block:
+  - name: Create config directories
+    become: yes
+    become_user: '{{ item[0] }}'
+    file: path=~/.config/{{ item[1] }} state=directory
+    with_nested: 
+      - '{{ users }}'
+      -  ['terminator', 'xfce4']
+
+  - name: Upload config to remote users
+    become: yes
+    become_user: '{{ item }}'
+    copy: src=config dest=~/.config/terminator/config
+    with_items: '{{ users }}'
+
+  - name: Set terminator as default shell for xfce
+    become: yes
+    become_user: '{{ item }}'
+    lineinfile: path=~/.config/xfce4/helpers.rc line='TerminalEmulator=debian-x-terminal-emulator' create=yes state=present
+    with_items: '{{ users }}'
+  
+  when: users is defined and installation is success

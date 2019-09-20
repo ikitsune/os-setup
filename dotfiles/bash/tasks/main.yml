@@ -1,0 +1,41 @@
+---
+- name: Ensure GRC shell color is installed
+  become: yes
+  apt: 
+    pkg: grc 
+    state: present
+  register: installation
+
+- name: Backup {{ bashrc }} [All Users]
+  become: yes
+  copy: 
+    src: "{{ bashrc }}"
+    dest: "{{ bashrc }}.bak"
+    backup: yes 
+    remote_src: yes
+
+- name: Add custom bashrc [All Users]
+  become: yes
+  template: 
+    src: ../template/bash.bashrc.j2 
+    dest: "{{ bashrc }}"
+
+- name: Update skeleton bashrc [New Users]
+  become: yes
+  lineinfile: 
+    path: /etc/skel/.bashrc 
+    line: 'force_color_prompt=yes' 
+    regexp: '.*force_color_prompt=.*'
+
+- name: Add custom bash_aliases [All Users]
+  become: yes
+  copy: 
+    src: bash.bash_aliases 
+    dest: "{{ bashalias }}"
+
+- name: Ensure bash_aliases is sourced in bashrc [All Users]
+  become: yes
+  lineinfile: 
+    dest: "{{ bashrc }}"
+    line: source {{ bashalias }}
+    state: present
